@@ -1,9 +1,5 @@
 const bcrypt = require('bcrypt');
-
-const NotFoundError = require('../errors/NotFoundError');
-const ConflictError = require('../errors/ConflictError');
 const User = require('../models/user');
-const InaccurateDataError = require('../errors/InaccurateDataError');
 
 // создаёт пользователя
 function registrationUser(req, res, next) {
@@ -17,7 +13,7 @@ function registrationUser(req, res, next) {
     .then((hash) => User.create({
       name,
       about,
-      avatar,
+      avatar
     }))
     .then((user) => {
       const { _id } = user;
@@ -26,17 +22,11 @@ function registrationUser(req, res, next) {
         name,
         about,
         avatar,
-        _id,
+        _id
       });
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким электронным адресом уже зарегистрирован'));
-      } else if (err.name === 'ValidationError') {
-        next(new InaccurateDataError('Переданы некорректные данные при регистрации пользователя'));
-      } else {
         next(err);
-      }
     });
 }
 
@@ -58,14 +48,10 @@ function getUserId(req, res, next) {
     .then((user) => {
       if (user) return res.send({ user });
 
-      throw new NotFoundError('Пользователь с таким id не найден');
+      next(err);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new InaccurateDataError('Передан некорректный id'));
-      } else {
         next(err);
-      }
     });
 }
 
