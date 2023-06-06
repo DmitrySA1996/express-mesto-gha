@@ -14,5 +14,6 @@ mongoose
   });
 
 app.use('/users', routeUsers);
+app.use((req, res, next) => next(new NotFoundError('Страницы по запрошенному URL не существует')));
 
 app.listen(PORT);
