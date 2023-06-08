@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const { CREATED } = require('../utils/constants');
 
 // создаёт пользователя
 function registrationUser(req, res, next) {
@@ -18,7 +19,7 @@ function registrationUser(req, res, next) {
     .then((user) => {
       const { _id } = user;
 
-      return res.status(201).send({
+      return res.status(CREATED).send({
         name,
         about,
         avatar,
