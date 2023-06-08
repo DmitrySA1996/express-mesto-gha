@@ -1,9 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const routes = require('./src/routes/router');
 const { PORT = 3000 } = process.env;
 const app = express();
-const { routeUsers } = require('./routes/users');
-const { NOT_FOUND } = require('./utils/constants');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 mongoose
   .connect('mongodb://127.0.0.1:27017/mestodb')
@@ -14,12 +16,7 @@ mongoose
     console.log('Не удалось подключиться к БД');
   });
 
-app.use('/users', routeUsers);
-app.use((req, res) => {
-  res.status(NOT_FOUND)
-    .send({
-      message: 'Страницы по запрошенному URL не существует'
-    });
+app.use(routes);
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
 });
-
-app.listen(PORT);
