@@ -3,14 +3,15 @@ const router = require('express').Router();
 const {
   getUsers,
   getUserId,
-  createUser
+  createUser,
+  updateProfile,
+  updateAvatar
 } = require('../controllers/users');
 
-// Пользователи:
-router.get('/', getUsers);
-// Конкретный пользователь по его ID:
-router.get('/:id', getUserId);
-// Создание пользователя:
-router.post('/', createUser);
+router.get('/', getUsers); // - // получить пользователей
+router.get('/:id', getUserId); // - Поиск пользователя по id
+router.post('/', createUser); // - Создать пользователя
+router.patch('/me', updateProfile); // - Обновляет профиль
+router.patch('/me/avatar', updateAvatar); // - Обновляет аватар
 
 module.exports = router;
