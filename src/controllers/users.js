@@ -11,7 +11,7 @@ module.exports.getUsers = (req, res) => {
 // Конкретный пользователь по его ID:
 module.exports.getUserId = (req, res) => {
   User
-    .findById(req.params.userId)
+    .findById(req.params.id)
     .orFail()
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
