@@ -57,7 +57,7 @@ module.exports.updateProfile = (req, res) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   ).orFail().then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
@@ -84,7 +84,7 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar },
-    { new: true })
+    { new: true, runValidators: true })
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {

@@ -4,7 +4,7 @@ const { OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/
 // Возвращает все карточки:
 module.exports.getInitialCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(OK).send(cards))
+    .then((cards) => res.send(cards))
     .catch(() => res
       .status(SERVER_ERROR)
       .send({ message: 'Произошла ошибка при запросе всех карточек' }));

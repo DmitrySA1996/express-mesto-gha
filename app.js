@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const routes = require('./src/routes/router');
 const { PORT = 3000 } = process.env;
 const app = express();
+const helmet = require('helmet');
 
+app.use(helmet());
+app.disable('x-powered-by');
 app.use(express.json());
 
 app.use((req, res, next) => {
