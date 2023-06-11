@@ -70,7 +70,7 @@ module.exports.updateProfile = (req, res) => {
 
       if (err.name === 'DocumentNotFoundError') {
         return res
-          .status(BAD_REQUEST)
+          .status(NOT_FOUND)
           .send({
             message: 'Пользователь не найден',
           });
