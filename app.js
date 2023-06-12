@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const routes = require('./src/routes/router');
 const { PORT = 3000 } = process.env;
 const app = express();
-const helmet = require('helmet');
 
 app.use(helmet());
 app.disable('x-powered-by');
