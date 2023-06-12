@@ -5,7 +5,7 @@ const {
   createCard,
   removeCard,
   likeCard,
-  dislikeCard
+  dislikeCard,
 } = require('../controllers/cards');
 
 router.get('/', getInitialCards); // - Возвращает все карточки
