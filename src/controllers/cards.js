@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 const {
-  OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR
+  OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR,
 } = require('../utils/constants');
 
 // Возвращает все карточки:

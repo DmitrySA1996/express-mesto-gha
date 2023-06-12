@@ -1,5 +1,7 @@
 const User = require('../models/user');
-const { OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/constants');
+const {
+  OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR
+} = require('../utils/constants');
 
 // Пользователи:
 module.exports.getUsers = (req, res) => {
@@ -53,7 +55,7 @@ module.exports.createUser = (req, res) => {
 
 // Обновление профиля:
 module.exports.updateProfile = (req, res) => {
-  const { name, about } = req.body;
+  const { name, about, } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
@@ -83,8 +85,11 @@ module.exports.updateProfile = (req, res) => {
 // Обновление аватара:
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar },
-    { new: true, runValidators: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { avatar },
+    { new: true, runValidators: true }
+    )
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
