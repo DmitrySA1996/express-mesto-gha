@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR } = require('../utils/constants');
+const {
+  OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR
+} = require('../utils/constants');
 
 // Возвращает все карточки:
 module.exports.getInitialCards = (req, res) => {
@@ -53,9 +55,9 @@ module.exports.removeCard = (req, res) => {
 // Поставить лайк карточке:
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-  req.params.cardId,
-  { $addToSet: { likes: req.user._id } },
-  { new: true },
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
   )
     .orFail()
     .then((card) => res.status(OK).send(card))
@@ -78,9 +80,9 @@ module.exports.likeCard = (req, res) => {
 // Удалить лайк с карточки:
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
-  req.params.cardId,
-  { $pull: { likes: req.user._id } },
-  { new: true },
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
   )
     .orFail()
     .then((card) => res.status(OK).send(card))

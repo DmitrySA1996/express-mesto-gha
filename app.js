@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+
 const routes = require('./src/routes/router');
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -11,7 +12,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '64838ceddaf4548e4af5c061'
+    _id: '64838ceddaf4548e4af5c061',
   };
 
   next();
