@@ -21,6 +21,24 @@ const userSchema = new mongoose.Schema({
       validator: (url) => validator.isURL(url),
       message: 'Некорректный адрес URL',
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: (email) => /.+@.+\..+/.test(email),
+        message: 'Требуется ввести электронный адрес',
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+      validate: {
+        validator: ({ length }) => length >= 6,
+        message: 'Пароль должен состоять минимум из 6 символов',
+      },
+    },
   },
 }, { versionKey: false });
 

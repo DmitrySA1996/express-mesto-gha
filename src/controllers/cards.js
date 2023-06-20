@@ -31,26 +31,36 @@ module.exports.createCard = (req, res) => {
 };
 
 // Удаление карточки:
-module.exports.removeCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+module.exports.removeCard = (req, res, next) => {
+  const { id: cardId } = req.params;
+  const { userId } = req.user;
+
+  Card
+    .findById({
+      _id: cardId,
+    })
     .then((card) => {
       if (!card) {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: 'Карточка c указанным id не найдена' });
+        throw new NotFoundError('Данные по указанному id не найдены');
       }
-      return res.status(OK).send(card);
+
+      const { owner: cardOwnerId } = card;
+
+      if (cardOwnerId.valueOf() !== userId) {
+        throw new ForbiddenError('Нет прав доступа');
+      }
+
+      return Card.findByIdAndDelete(cardId);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({
-          message: 'Переданы некорректные данные карточки.',
-        });
-      } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
+    .then((deletedCard) => {
+      if (!deletedCard) {
+        throw new NotFoundError('Карточка уже была удалена');
       }
-    });
-};
+
+      res.send({ data: deletedCard });
+    })
+    .catch(next);
+}
 
 // Поставить лайк карточке:
 module.exports.likeCard = (req, res) => {
