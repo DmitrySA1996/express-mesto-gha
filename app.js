@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 
 const routes = require('./src/routes/router');
+const {login, createUser} = require('./src/routes/users');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -11,13 +12,8 @@ app.use(helmet());
 app.disable('x-powered-by');
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64838ceddaf4548e4af5c061',
-  };
-
-  next();
-});
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use(routes);
 
