@@ -1,8 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
-
+const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
 const routes = require('./src/routes/router');
+const auth = require('./src/middlewares/auth');
+const limiter = require('./src/middlewares/rateLimiter');
+const errorHandler = require('./src/middlewares/errorHandler');
+
+const NotFoundError = require('./src/errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -22,6 +28,15 @@ mongoose
     console.log('Не удалось подключиться к БД');
   });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(limiter);
+
+app.use(auth);
+
+app.use((req, res, next) => next(new NotFoundError('Страницы по запрошенному URL не существует')));
+app.use(errors());
+app.use(errorHandler);
+
+app.listen(PORT);
