@@ -2,6 +2,8 @@ const Card = require('../models/card');
 const {
   OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR,
 } = require('../utils/constants');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 // Возвращает все карточки:
 module.exports.getInitialCards = (req, res) => {
@@ -60,7 +62,7 @@ module.exports.removeCard = (req, res, next) => {
       res.send({ data: deletedCard });
     })
     .catch(next);
-}
+};
 
 // Поставить лайк карточке:
 module.exports.likeCard = (req, res) => {
