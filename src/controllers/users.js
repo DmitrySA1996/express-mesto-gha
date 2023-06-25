@@ -1,8 +1,13 @@
-const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const { SECRET_SIGNING_KEY } = require('../utils/constants');
 const {
   OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR,
 } = require('../utils/constants');
+const ConflictError = require('../errors/ConflictError');
+const InaccurateDataError = require('../errors/InaccurateDataError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 // Пользователи:
 module.exports.getUsers = (req, res) => {
@@ -76,7 +81,7 @@ module.exports.createUser = (req, res, next) => {
         next(err);
       }
     });
-}
+};
 
 // Обновление профиля:
 module.exports.updateProfile = (req, res) => {
@@ -156,4 +161,4 @@ module.exports.loginUser = (req, res, next) => {
       throw new UnauthorizedError('Неправильные почта или пароль');
     })
     .catch(next);
-}
+};
