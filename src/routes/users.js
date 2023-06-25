@@ -10,8 +10,27 @@ const {
   loginUser,
 } = require('../controllers/users');
 
-router.get('/', getUsers); // - // получить пользователей
-router.get('/:id', getUserId); // - Поиск пользователя по id
+router.get('/', getUsers); // - получить пользователей
+router.get('/:id', celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().length(24).hex().required(),
+  }),
+}), getUserId);
+
+router.patch('/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateProfile);
+
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi
+      .string()
+      .pattern(URL_REGEX),
+  }),
+}), updateAvatar);
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -23,8 +42,6 @@ router.post('/signup', celebrate({
       .pattern(URL_REGEX),
   }),
 }), createUser); // - Создать пользователя
-router.patch('/me', updateProfile); // - Обновляет профиль
-router.patch('/me/avatar', updateAvatar); // - Обновляет аватар
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
