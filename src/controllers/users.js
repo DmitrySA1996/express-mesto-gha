@@ -9,38 +9,25 @@ const ConflictError = require('../errors/ConflictError');
 const InaccurateDataError = require('../errors/InaccurateDataError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-// Пользователи:
-module.exports.getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' }));
-};
+module.exports.loginUser = (req, res, next) => {
+  const { email, password } = req.body;
 
-// Конкретный пользователь по его ID:
-module.exports.getUserId = (req, res) => {
   User
-    .findById(req.params.id)
-    .orFail()
-    .then((user) => res.status(OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res
-          .status(BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при поиске пользователя',
-          });
+    .findUserByCredentials(email, password)
+    .then(({ _id: userId }) => {
+      if (userId) {
+        const token = jwt.sign(
+          { userId },
+          SECRET_SIGNING_KEY,
+          { expiresIn: '7d' },
+        );
+
+        return res.send({ _id: token });
       }
 
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(NOT_FOUND)
-          .send({
-            message: 'Пользователь c указанным _id не найден',
-          });
-      }
-
-      return res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
-    });
+      throw new UnauthorizedError('Неправильные почта или пароль');
+    })
+    .catch(next);
 };
 
 // Создание пользователя:
@@ -80,6 +67,40 @@ module.exports.createUser = (req, res, next) => {
       } else {
         next(err);
       }
+    });
+};
+
+// Пользователи:
+module.exports.getUsers = (req, res) => {
+  User.find({})
+    .then((users) => res.send(users))
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' }));
+};
+
+// Конкретный пользователь по его ID:
+module.exports.getUserId = (req, res) => {
+  User
+    .findById(req.params.id)
+    .orFail()
+    .then((user) => res.status(OK).send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res
+          .status(BAD_REQUEST)
+          .send({
+            message: 'Переданы некорректные данные при поиске пользователя',
+          });
+      }
+
+      if (err.name === 'DocumentNotFoundError') {
+        return res
+          .status(NOT_FOUND)
+          .send({
+            message: 'Пользователь c указанным _id не найден',
+          });
+      }
+
+      return res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
@@ -140,25 +161,4 @@ module.exports.updateAvatar = (req, res) => {
 
       return res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
-};
-
-module.exports.loginUser = (req, res, next) => {
-  const { email, password } = req.body;
-
-  User
-    .findUserByCredentials(email, password)
-    .then(({ _id: userId }) => {
-      if (userId) {
-        const token = jwt.sign(
-          { userId },
-          SECRET_SIGNING_KEY,
-          { expiresIn: '7d' },
-        );
-
-        return res.send({ _id: token });
-      }
-
-      throw new UnauthorizedError('Неправильные почта или пароль');
-    })
-    .catch(next);
 };
