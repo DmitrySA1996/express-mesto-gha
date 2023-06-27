@@ -107,15 +107,14 @@ module.exports.getUserId = (req, res) => {
 
 // Обновление профиля:
 module.exports.updateProfile = (req, res, next) => {
-  const { name, about } = req.body;
+  const { avatar } = req.body;
   const { userId } = req.user;
 
   User
     .findByIdAndUpdate(
       userId,
       {
-        name,
-        about,
+        avatar,
       },
       {
         new: true,
@@ -129,7 +128,7 @@ module.exports.updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля'));
+        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля пользователя'));
       } else {
         next(err);
       }
