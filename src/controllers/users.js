@@ -105,6 +105,26 @@ module.exports.getUserId = (req, res) => {
     });
 };
 
+// поиск пользователя:
+module.exports.currentUserInfo = (req, res, next) => {
+  const { userId } = req.user;
+
+  User
+    .findById(userId)
+    .then((user) => {
+      if (user) return res.send({ user });
+
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new InaccurateDataError('Передан некорректный id'));
+      } else {
+        next(err);
+      }
+    });
+};
+
 // Обновление профиля:
 module.exports.updateProfile = (req, res, next) => {
   const { avatar } = req.body;
