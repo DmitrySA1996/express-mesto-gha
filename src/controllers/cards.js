@@ -1,7 +1,4 @@
 const Card = require('../models/card');
-const {
-  CREATED, BAD_REQUEST, SERVER_ERROR,
-} = require('../utils/constants');
 
 const InaccurateDataError = require('../errors/InaccurateDataError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -17,19 +14,18 @@ module.exports.getInitialCards = (_, res, next) => {
 };
 
 // Создаёт карточку:
-module.exports.createCard = (req, res) => {
-  console.log(req.user._id);
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => res.status(CREATED).send(card))
+  const { userId } = req.user;
+
+  Card
+    .create({ name, link, owner: userId })
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({
-          message: 'Переданы некорректные данные при создании карточки.',
-        });
+      if (err.name === 'ValidationError') {
+        next(new InaccurateDataError('Переданы некорректные данные при создании карточки'));
       } else {
-        res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
+        next(err);
       }
     });
 };
