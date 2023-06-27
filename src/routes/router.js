@@ -5,8 +5,8 @@ const registerRoutes = require('./register');
 const loginRoutes = require('./login');
 const auth = require('../middlewares/auth');
 
-router.use('/signup', registerRoutes);
-router.use('/signin', loginRoutes);
+router.use('/', registerRoutes);
+router.use('/', loginRoutes);
 router.use(auth);
 router.use('/users', userRoutes);
 router.use('/cards', cardRoutes);
