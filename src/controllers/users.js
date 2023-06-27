@@ -127,6 +127,37 @@ module.exports.currentUserInfo = (req, res, next) => {
 
 // Обновление профиля:
 module.exports.updateProfile = (req, res, next) => {
+  const { name, about } = req.body;
+  const { userId } = req.user;
+
+  User
+    .findByIdAndUpdate(
+      userId,
+      {
+        name,
+        about,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    )
+    .then((user) => {
+      if (user) return res.send({ user });
+
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+// Обновление аватара:
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { userId } = req.user;
 
@@ -148,39 +179,9 @@ module.exports.updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля пользователя'));
+        next(new InaccurateDataError('Переданы некорректные данные при обновлении профиля'));
       } else {
         next(err);
       }
-    });
-};
-
-// Обновление аватара:
-module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    { new: true, runValidators: true },
-  )
-    .then((user) => res.status(OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res
-          .status(BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при обновлении аватара',
-          });
-      }
-
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(NOT_FOUND)
-          .send({
-            message: 'Пользователь не найден',
-          });
-      }
-
-      return res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
