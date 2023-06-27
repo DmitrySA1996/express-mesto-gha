@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const routes = require('./src/routes/router');
-const auth = require('./src/middlewares/auth');
 const limiter = require('./src/middlewares/rateLimiter');
 const errorHandler = require('./src/middlewares/errorHandler');
 
@@ -32,8 +31,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(limiter);
-
-app.use(auth);
 
 app.use((req, res, next) => next(new NotFoundError('Страницы по запрошенному URL не существует')));
 app.use(errors());
