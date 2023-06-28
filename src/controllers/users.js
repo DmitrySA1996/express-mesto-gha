@@ -2,9 +2,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { SECRET_SIGNING_KEY } = require('../utils/constants');
-const {
-  OK, CREATED, BAD_REQUEST, NOT_FOUND, SERVER_ERROR,
-} = require('../utils/constants');
 const ConflictError = require('../errors/ConflictError');
 const InaccurateDataError = require('../errors/InaccurateDataError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
@@ -52,7 +49,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const { _id } = user;
 
-      return res.status(CREATED).send({
+      return res.status(201).send({
         email,
         name,
         about,
@@ -72,36 +69,31 @@ module.exports.createUser = (req, res, next) => {
 };
 
 // Пользователи:
-module.exports.getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch(() => res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' }));
+module.exports.getUsers = (_, res, next) => {
+  User
+    .find({})
+    .then((users) => res.send({ users }))
+    .catch(next);
 };
 
 // Конкретный пользователь по его ID:
-module.exports.getUserId = (req, res) => {
+module.exports.getUserId = (req, res, next) => {
+  const { id } = req.params;
+
   User
-    .findById(req.params.id)
-    .orFail()
-    .then((user) => res.status(OK).send(user))
+    .findById(id)
+
+    .then((user) => {
+      if (user) return res.send({ user });
+
+      throw new NotFoundError('Пользователь с таким id не найден');
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res
-          .status(BAD_REQUEST)
-          .send({
-            message: 'Переданы некорректные данные при поиске пользователя',
-          });
+        next(new InaccurateDataError('Передан некорректный id'));
+      } else {
+        next(err);
       }
-
-      if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(NOT_FOUND)
-          .send({
-            message: 'Пользователь c указанным _id не найден',
-          });
-      }
-
-      return res.status(SERVER_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 

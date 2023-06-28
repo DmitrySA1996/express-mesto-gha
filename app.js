@@ -7,9 +7,7 @@ const routes = require('./src/routes/router');
 const limiter = require('./src/middlewares/rateLimiter');
 const errorHandler = require('./src/middlewares/errorHandler');
 
-const NotFoundError = require('./src/errors/NotFoundError');
-
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const app = express();
 
 app.use(helmet());
@@ -19,7 +17,7 @@ app.use(express.json());
 app.use(routes);
 
 mongoose
-  .connect('mongodb://127.0.0.1:27017/mestodb')
+  .connect(DB_URL)
   .then(() => {
     console.log('БД подключена');
   })
@@ -32,7 +30,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(limiter);
 
-app.use((req, res, next) => next(new NotFoundError('Страницы по запрошенному URL не существует')));
 app.use(errors());
 app.use(errorHandler);
 
